@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import { AppContext } from './contexts/AppContext';
 import { globalLayers } from './globalLayers';
 import ReturnIcon from './Icons/ReturnIcon';
-import { SimpleStorageSetting, store, storeIconCategory, storeIconType } from './logic/storage';
+import { SimpleStorageSetting, store, storeIconType } from './logic/storage';
 import { compareNames } from './logic/util';
 import { makeStyles } from './theme';
 
@@ -125,13 +125,46 @@ export default function FrameMenu(props: IProps) {
     } = props;
     const context = useContext(AppContext);
     const { classes } = useStyles();
+    const inputCategories = {};
+
+    function isIconCategoryChecked(name: string, settings: IconSettings | undefined) {
+        if (settings) {
+            var checked = 0;
+            var total = 0;
+            for (const type in settings.categories[name].types) {
+                if (settings.categories[name].types[type].value)
+                    checked++;
+                total++;
+            }
+            if (checked > 0)
+                return checked == total ? 2 : 1;
+        }
+        return 0;
+    }
+
+    function evalIconCategory(name: string, settings: IconSettings | undefined) {
+        const checked = isIconCategoryChecked(name, settings);
+        if (checked == 1) {
+            inputCategories[name].indeterminate = true;
+            inputCategories[name].checked = false;
+
+        } else if (checked == 2) {
+            inputCategories[name].indeterminate = false;
+            inputCategories[name].checked = true;
+        } else {
+            inputCategories[name].indeterminate = false;
+            inputCategories[name].checked = false;
+        }
+    }
 
     function updateIconCategorySettings(name: string, value: boolean) {
         const settings = context.settings.iconSettings;
-        storeIconCategory(name, value);
         if (settings) {
             return produce(settings, draft => {
-                draft.categories[name].value = value;
+                for (const type in draft.categories[name].types) {
+                    draft.categories[name].types[type].value = value;
+                    storeIconType(name, type, value);
+                }
             });
         }
         return settings;
@@ -148,6 +181,7 @@ export default function FrameMenu(props: IProps) {
         if (settings) {
             return produce(settings, draft => {
                 draft.categories[category].types[type].value = value;
+                evalIconCategory(category, draft);
             });
         }
         return settings;
@@ -177,7 +211,7 @@ export default function FrameMenu(props: IProps) {
                     <label className={classes.checkbox}>
                         <input
                             type='checkbox'
-                            checked={category.value}
+                            ref={el => inputCategories[categoryKey] = el}
                             onChange={e => context.update({ iconSettings: updateIconCategorySettings(categoryKey, e.currentTarget.checked) })}
                         />
                         {category.name}

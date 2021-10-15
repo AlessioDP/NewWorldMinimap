@@ -71,12 +71,6 @@ function loadUntyped<T>(key: string, defaultValue: T) {
     return defaultValue;
 }
 
-/** Stores whether the icon category is visible. */
-export function storeIconCategory(category: string, value: boolean) {
-    const key = `${iconSettingStorageScope}::${category}.visible`;
-    return storeUntyped(key, value);
-}
-
 /** Stores whether the icon type (part of a category) is visible. */
 export function storeIconType(category: string, type: string, value: boolean) {
     const key = `${iconSettingStorageScope}::${category}-${type}.visible`;
