@@ -36,6 +36,7 @@ declare type IconCategorySetting = {
     name: string,
     value: boolean,
     types: Record<string, IconTypeSetting>,
+    showText: boolean,
 }
 
 declare type IconSettings = {

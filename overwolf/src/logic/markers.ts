@@ -1,5 +1,5 @@
 import { getIconName } from './icons';
-import { loadIconCategory, loadIconType } from './storage';
+import { loadIconCategory, loadIconCategoryText, loadIconType } from './storage';
 import { getTileMarkerCache } from './tileMarkerCache';
 
 const tileMarkerCache = getTileMarkerCache();
@@ -27,6 +27,7 @@ export async function getDefaultIconSettings() {
                     name: getIconName(marker.category),
                     value: loadIconCategory(marker.category),
                     types: {},
+                    showText: loadIconCategoryText(marker.category),
                 };
             }
 

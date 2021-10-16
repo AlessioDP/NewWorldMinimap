@@ -81,6 +81,12 @@ export function storeIconCategory(category: string, value: boolean) {
     return storeUntyped(key, value);
 }
 
+/** Stores whether the icon category text is visible. */
+export function storeIconCategoryText(category: string, value: boolean) {
+    const key = `${iconSettingStorageScope}::${category}.showText`;
+    return storeUntyped(key, value);
+}
+
 /** Stores whether the icon type (part of a category) is visible. */
 export function storeIconType(category: string, type: string, value: boolean) {
     const key = `${iconSettingStorageScope}::${category}--${type}.visible`;
@@ -91,6 +97,12 @@ export function storeIconType(category: string, type: string, value: boolean) {
 export function loadIconCategory(category: string) {
     const key = `${iconSettingStorageScope}::${category}.visible`;
     return loadUntyped(key, !defaultHiddenIconCategories.includes(category)) as boolean;
+}
+
+/** Loads whether the icon category text is visible. */
+export function loadIconCategoryText(category: string) {
+    const key = `${iconSettingStorageScope}::${category}.showText`;
+    return loadUntyped(key, true) as boolean;
 }
 
 /** Loads whether the icon type (part of a category) is visible. */

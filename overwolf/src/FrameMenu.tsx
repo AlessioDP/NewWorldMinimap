@@ -5,8 +5,10 @@ import { AppContext } from './contexts/AppContext';
 import { globalLayers } from './globalLayers';
 import ReturnIcon from './Icons/ReturnIcon';
 import SelectIcon from './Icons/SelectIcon';
+import TextIcon from './Icons/TextIcon';
+import TextHiddenIcon from './Icons/TextHiddenIcon';
 import UnselectIcon from './Icons/UnselectIcon';
-import { SimpleStorageSetting, store, storeIconCategory, storeIconType, zoomLevelSettingBounds } from './logic/storage';
+import { SimpleStorageSetting, store, storeIconCategory, storeIconCategoryText, storeIconType, zoomLevelSettingBounds } from './logic/storage';
 import { compareNames } from './logic/util';
 import { makeStyles } from './theme';
 
@@ -48,16 +50,17 @@ const useStyles = makeStyles()(theme => ({
             outline: `1px solid ${theme.frameMenuColor}`,
         },
     },
-    selectIcon: {
+    categoryButtonIcon: {
         background: 'transparent',
         border: 'none',
         color: theme.frameMenuColor,
         padding: 0,
+        margin: '0 2px',
         width: 18,
         height: 18,
 
         '&:focus': {
-            outline: `1px solid ${theme.frameMenuColor}`,
+            outline: 0,
         },
     },
     title: {
@@ -175,6 +178,17 @@ export default function FrameMenu(props: IProps) {
         return settings;
     }
 
+    function updateIconCategoryText(category: string, value: boolean) {
+        const settings = context.settings.iconSettings;
+        storeIconCategoryText(category, value);
+        if (settings) {
+            return produce(settings, draft => {
+                draft.categories[category].showText = value;
+            });
+        }
+        return settings;
+    }
+
     function selectAllIconsByCategory(category: string, value: boolean) {
         const settings = context.settings.iconSettings;
         if (settings) {
@@ -209,6 +223,19 @@ export default function FrameMenu(props: IProps) {
                 </p>;
             });
 
+            let showTextButton : JSX.Element;
+            if (category.showText) {
+                showTextButton = <button className={classes.categoryButtonIcon}
+                    onClick={() => context.update({ iconSettings: updateIconCategoryText(categoryKey, false) }) }>
+                    <TextIcon />
+                </button>
+            } else {
+                showTextButton = <button className={classes.categoryButtonIcon}
+                    onClick={() => context.update({ iconSettings: updateIconCategoryText(categoryKey, true) }) }>
+                    <TextHiddenIcon />
+                </button>
+            }
+
             return <details key={'FrameMenuCat' + categoryKey}>
                 <summary className={clsx(classes.summary, classes.iconCategory)}>
                     <label className={classes.checkbox}>
@@ -220,10 +247,11 @@ export default function FrameMenu(props: IProps) {
                         {category.name}
                     </label>
                     <span />
-                    <button className={classes.selectIcon} onClick={() => context.update({ iconSettings: selectAllIconsByCategory(categoryKey, true) })}>
+                    {showTextButton}
+                    <button className={classes.categoryButtonIcon} onClick={() => context.update({ iconSettings: selectAllIconsByCategory(categoryKey, true) })}>
                         <SelectIcon />
                     </button>
-                    <button className={classes.selectIcon} onClick={() => context.update({ iconSettings: selectAllIconsByCategory(categoryKey, false) })}>
+                    <button className={classes.categoryButtonIcon} onClick={() => context.update({ iconSettings: selectAllIconsByCategory(categoryKey, false) })}>
                         <UnselectIcon />
                     </button>
                 </summary>
